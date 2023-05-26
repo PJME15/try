@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="asi.png">
+    <link rel="stylesheet" href="b.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>ADMIN LOGIN</title>
+    <style>
+
+        @media screen and (min-width: 768px) {
+
+        .admin-form-box {
+          margin-top: 20px;
+          background-color: ghostwhite;
+          padding: 20px;
+          border-radius: 10px;
+          border: 1px solid black;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+          animation: flipOutY 0.5s;
+          transform-style: preserve-3d;
+        }
+    }
+
+        
+    </style>
+</head>
+<body>
+   <div class="box">
+    <div class="container">
+        <div class="login-buttons">
+          <div class="login-button-group">
+            <a href="superad.html"><button class="login-button" id="superadmin-login"><b>SUPERADMIN LOGIN</b></button></a>
+          </div>
+          <div class="login-button-group">
+            <div class="admin-login-box">
+              <button class="login-button" id="admin-login"><b>ADMIN LOGIN</b></button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-form-box" id="admin-form">
+          <div class="logo">
+            <img src="asi.png"> <!-- Replace "logo.png" with the path to your logo image -->
+          </div>
+          <header>ADMINISTRATOR</header>
+          <div class="input-field">
+              <input type="text" class="input" placeholder="Username" id="">
+              <i class='bx bx-user'></i>
+          </div>
+          <div class="input-field">
+              <input type="password" class="input" placeholder="Password" id="">
+              <i class='bx bx-lock-alt'></i>
+          </div>
+          <div class="input-field">
+              <input type="submit" class="submit" value="LOGIN" id="">
+          </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+     // Get references to the form elements
+     const adminForm = document.getElementById('admin-form');
+     const adminLoginButton = document.getElementById('admin-login');
+
+     // Add event listener to the admin login button
+     adminLoginButton.addEventListener('click', () => {
+       adminForm.classList.add('flipped');
+       setTimeout(() => {
+         window.location.href = 'admin.html';
+       }, 500); // Adjust the delay as desired (in milliseconds)
+     });
+</script>
+</body>
+</html>
