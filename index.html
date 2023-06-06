@@ -1,8 +1,4 @@
-<?php
-include "con.php";
-session_start();
-include "mailer.php";
-?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -143,101 +139,7 @@ include "mailer.php";
           <img src="asi.png"> <!-- Replace "logo.png" with the path to your logo image -->
         </div>
         <header>REGISTRATION</header>
-        <?php
-        // Check if the form is submitted
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-          // Retrieve the username, password, email, and phone number entered in the form
-          $username = mysqli_real_escape_string($con, $_POST['username']);
-          $password = $_POST['password'];
-          $email = mysqli_real_escape_string($con, $_POST['email']);
-          $phone = mysqli_real_escape_string($con, $_POST['phone']);
-          $status = "pending";
-
-          // Validate input fields
-          if (empty($username) || empty($password) || empty($email) || empty($phone)) {
-            echo "<script>
-              Swal.fire({
-                icon: 'warning',
-                title: 'Error',
-                text: 'Please fill all the required fields',
-              });
-            </script>";
-          } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo "<script>
-              Swal.fire({
-                icon: 'warning',
-                title: 'Error',
-                text: 'Invalid email format',
-              });
-            </script>";
-          } elseif (!preg_match('/^[0-9]{11}$/', $phone)) {
-            echo "<script>
-              Swal.fire({
-                icon: 'warning',
-                title: 'Error',
-                text: 'Invalid phone number format. Phone number should be 10 digits',
-              });
-            </script>";
-          } else {
-            // Check if the username, email, and phone number already exist
-            $query = "SELECT * FROM user WHERE username = '$username' OR email = '$email' OR phone = '$phone'";
-            $result = mysqli_query($con, $query);
-
-            if (mysqli_num_rows($result) > 0) {
-              $existingFields = array();
-
-              while ($row = mysqli_fetch_assoc($result)) {
-                if ($row['username'] === $username) {
-                  $existingFields[] = "Username";
-                }
-                if ($row['email'] === $email) {
-                  $existingFields[] = "Email";
-                }
-                if ($row['phone'] === $phone) {
-                  $existingFields[] = "Phone number";
-                }
-              }
-
-              $errorMessage = implode(", ", $existingFields) . " already exists!";
-
-              echo "<script>
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Error',
-                  text: '$errorMessage',
-                });
-              </script>";
-            } else {
-              // Hash the password using a secure hashing algorithm
-              $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-              // Insert the username, hashed password, email, phone number, and status into the database
-              $query = "INSERT INTO user (username, password, email, phone, status) VALUES ('$username', '$hashedPassword', '$email', '$phone', '$status')";
-              $insertResult = mysqli_query($con, $query);
-
-              if ($insertResult) {
-                $_SESSION['email'] = $email;
-                Email::sendEmail($email);
-                echo "<script>
-                  Swal.fire({
-                    icon: 'info',
-                    title: 'OTP SENT SUCCESSFULLY',
-                    text: 'OTP has been sent to your email address. Please verify!',
-                  }).then(() => {
-                    window.location.href = 'otp.php';
-                  });
-                </script>";
-                exit();
-              } else {
-                echo '<script>alert("Invalid Input")</script>';
-              }
-            }
-          }
-        }
-
-        // Close the database connection
-        mysqli_close($con);
-        ?>
+       
         <form method="POST" action="">
           <div class="input-field">
             <input type="text" class="input" placeholder="Username" name="username">
