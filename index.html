@@ -1,0 +1,266 @@
+<?php
+include "con.php";
+session_start();
+include "mailer.php";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/x-icon" href="asi.png">
+  <link rel="stylesheet" href="reg.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>REGISTER</title>
+  
+  <style>
+    /* Add the following rules */
+    .swal2-popup {
+      width: auto important; /* Adjust the width as desired */
+      height: auto !important; /* Adjust the height as desired */
+      border-radius: 15px;
+      background-color: azure;
+    }
+
+    .swal2-icon {
+      width: 70px;
+      height: 70px;
+    }
+
+    .swal2-title {
+      font-size: 20px;
+    }
+
+    .swal2-text {
+      font-size: 25px;
+    }
+
+    .box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    @media screen and (min-width: 768px) {
+      .left-container {
+        display: block;
+        width: 50%;
+        padding-right: 20px;
+        box-sizing: border-box;
+      }
+
+      .admin-content {
+        flex: 1;
+      }
+
+      .admin-form-box {
+        margin-top: 20px;
+        background-color: rgb(255, 254, 204, 0.8);
+        padding-right: 20px;
+        padding-bottom: 20px;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        border: 1px solid black;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+        transform-style: preserve-3d;
+        animation: flipOutY 0.5s;
+        display: flex;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+      }
+    }
+
+    .left-container {
+      /* Customize the styles for the left container as needed */
+      display: none;
+    }
+
+    .admin-content {
+      /* Adjust the styles for the admin content */
+      flex: 1;
+    }
+
+    @media screen and (min-width: 768px) {
+      .left-container {
+        display: block;
+        width: 50%;
+        padding-right: 20px;
+        box-sizing: border-box;
+      }
+
+      .admin-content {
+        flex: 1;
+      }
+    }
+
+    .left-container > .green {
+      background-color: #556B2F;
+      height: 100%;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+      border-right: 4px solid rgb(189, 155, 25, 0.7);
+    }
+
+    h1 {
+      color: transparent;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <div class="box">
+    <div class="login-buttons">
+      <div class="login-button-group">
+        <div class="admin-login-box">
+          <a href="log.php">
+            <button class="login-button"><b>LOGIN</b></button>
+          </a>
+        </div>
+      </div>
+      <div class="login-button-group">
+        <a href="reg.php">
+          <button class="login-button"><b>REGISTER</b></button>
+        </a>
+      </div>
+    </div>
+    <div class="admin-form-box" id="admin-form">
+      <div class="left-container">
+        <span class="green"></span>
+        <!-- Add your content for the left container here -->
+        <!-- Example content: -->
+        <h1>reg</h1>
+      </div>
+      <div class="admin-content">
+        <div class="logo">
+          <img src="asi.png"> <!-- Replace "logo.png" with the path to your logo image -->
+        </div>
+        <header>REGISTRATION</header>
+        <?php
+        // Check if the form is submitted
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+          // Retrieve the username, password, email, and phone number entered in the form
+          $username = mysqli_real_escape_string($con, $_POST['username']);
+          $password = $_POST['password'];
+          $email = mysqli_real_escape_string($con, $_POST['email']);
+          $phone = mysqli_real_escape_string($con, $_POST['phone']);
+          $status = "pending";
+
+          // Validate input fields
+          if (empty($username) || empty($password) || empty($email) || empty($phone)) {
+            echo "<script>
+              Swal.fire({
+                icon: 'warning',
+                title: 'Error',
+                text: 'Please fill all the required fields',
+              });
+            </script>";
+          } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo "<script>
+              Swal.fire({
+                icon: 'warning',
+                title: 'Error',
+                text: 'Invalid email format',
+              });
+            </script>";
+          } elseif (!preg_match('/^[0-9]{11}$/', $phone)) {
+            echo "<script>
+              Swal.fire({
+                icon: 'warning',
+                title: 'Error',
+                text: 'Invalid phone number format. Phone number should be 10 digits',
+              });
+            </script>";
+          } else {
+            // Check if the username, email, and phone number already exist
+            $query = "SELECT * FROM user WHERE username = '$username' OR email = '$email' OR phone = '$phone'";
+            $result = mysqli_query($con, $query);
+
+            if (mysqli_num_rows($result) > 0) {
+              $existingFields = array();
+
+              while ($row = mysqli_fetch_assoc($result)) {
+                if ($row['username'] === $username) {
+                  $existingFields[] = "Username";
+                }
+                if ($row['email'] === $email) {
+                  $existingFields[] = "Email";
+                }
+                if ($row['phone'] === $phone) {
+                  $existingFields[] = "Phone number";
+                }
+              }
+
+              $errorMessage = implode(", ", $existingFields) . " already exists!";
+
+              echo "<script>
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Error',
+                  text: '$errorMessage',
+                });
+              </script>";
+            } else {
+              // Hash the password using a secure hashing algorithm
+              $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+              // Insert the username, hashed password, email, phone number, and status into the database
+              $query = "INSERT INTO user (username, password, email, phone, status) VALUES ('$username', '$hashedPassword', '$email', '$phone', '$status')";
+              $insertResult = mysqli_query($con, $query);
+
+              if ($insertResult) {
+                $_SESSION['email'] = $email;
+                Email::sendEmail($email);
+                echo "<script>
+                  Swal.fire({
+                    icon: 'info',
+                    title: 'OTP SENT SUCCESSFULLY',
+                    text: 'OTP has been sent to your email address. Please verify!',
+                  }).then(() => {
+                    window.location.href = 'otp.php';
+                  });
+                </script>";
+                exit();
+              } else {
+                echo '<script>alert("Invalid Input")</script>';
+              }
+            }
+          }
+        }
+
+        // Close the database connection
+        mysqli_close($con);
+        ?>
+        <form method="POST" action="">
+          <div class="input-field">
+            <input type="text" class="input" placeholder="Username" name="username">
+            <i class='bx bx-user'></i>
+          </div>
+          <div class="input-field">
+            <input type="password" class="input" placeholder="Password" name="password">
+            <i class='bx bx-lock-alt'></i>
+          </div>
+          <div class="input-field">
+            <input type="text" class="input" placeholder="Email" name="email">
+            <i class="bx bx-envelope"></i>
+          </div>
+          <div class="input-field">
+            <input type="text" class="input" placeholder="Phone number" name="phone">
+            <i class="bx bx-phone"></i>
+          </div>
+          <div class="input-field">
+            <input type="submit" name="submit" class="submit" value="REGISTER">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
